@@ -1,0 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public static class GameUtils
+{
+    public static bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+
+    public static float Remap(this float value, float from1, float to1, float from2, float to2)
+    {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+    }
+
+    public static Vector3 With(this Vector3 original, float? x = null, float? y = null, float? z = null)
+    {
+        float newX = x.HasValue ? x.Value : original.x;
+        float newY = y.HasValue ? y.Value : original.y;
+        float newZ = z.HasValue ? z.Value : original.z;
+        return new Vector3(newX, newY, newZ);
+    }
+
+    public static bool IsVisibleFrom(this Renderer renderer, Camera camera)
+    {
+        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+        return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+    }
+
+    public static bool isBehind(this Vector3 queried, Vector3 forward)
+    {
+        return Vector3.Dot(queried, forward) < 0f;
+    }
+}
